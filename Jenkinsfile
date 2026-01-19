@@ -1,43 +1,39 @@
 pipeline {
-  agent any
-
-  tools {
-    nodejs 'node'
-  }
-
-  stages {
-
-    stage('Checkout') {
-      steps {
-        echo 'Code checkout completed'
-      }
-    }
-
-    stage('Backend - Install Dependencies') {
-      steps {
-        dir('backend') {
-          sh 'node -v'
-          sh 'npm -v'
-          sh 'npm install'
+    agent {
+        docker {
+            image 'node:20'
+            args '-u root:root'  // optional
         }
-      }
     }
 
-    stage('Backend - Test') {
-      steps {
-        dir('backend') {
-          sh 'npm test'
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
         }
-      }
-    }
-  }
 
-  post {
-    success {
-      echo 'Backend CI passed'
+        stage('Backend - Install Dependencies') {
+            steps {
+                dir('backend') {
+                    sh 'node -v'
+                    sh 'npm -v'
+                    sh 'npm install'
+                }
+            }
+        }
+
+        stage('Backend - Test') {
+            steps {
+                dir('backend') {
+                    sh 'npm test'
+                }
+            }
+        }
     }
-    failure {
-      echo 'Backend CI failed'
+
+    post {
+        success { echo 'Backend CI passed' }
+        failure { echo 'Backend CI failed' }
     }
-  }
 }
