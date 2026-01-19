@@ -6,6 +6,7 @@ pipeline {
   }
 
   stages {
+
     stage('Checkout') {
       steps {
         echo 'Code checkout completed'
@@ -15,6 +16,8 @@ pipeline {
     stage('Backend - Install Dependencies') {
       steps {
         dir('backend') {
+          sh 'node -v'
+          sh 'npm -v'
           sh 'npm install'
         }
       }
@@ -30,11 +33,11 @@ pipeline {
   }
 
   post {
-    failure {
-      echo 'Backend CI failed'
-    }
     success {
       echo 'Backend CI passed'
+    }
+    failure {
+      echo 'Backend CI failed'
     }
   }
 }
